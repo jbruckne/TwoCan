@@ -3,8 +3,6 @@ package com.joebruckner.twocan.ui.common
 class BaseContract {
 
     interface View {
-        fun showLoading()
-        fun hideLoading()
         fun showError(error: String)
     }
 

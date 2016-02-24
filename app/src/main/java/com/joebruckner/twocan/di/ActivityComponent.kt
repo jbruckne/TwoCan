@@ -1,7 +1,7 @@
 package com.joebruckner.twocan.di
 
 import android.app.Activity
-import android.view.LayoutInflater
+import com.firebase.client.Firebase
 import dagger.Component
 
 @PerActivity
@@ -10,7 +10,6 @@ import dagger.Component
         modules = arrayOf(ActivityModule::class)
 )
 interface ActivityComponent {
-
     fun activity(): Activity
-    fun layoutInflater(): LayoutInflater
+    fun ref(): Firebase
 }
