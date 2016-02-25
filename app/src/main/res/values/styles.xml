@@ -1,11 +1,21 @@
 <resources>
 
+    <style name="AppTheme" parent="Base.AppTheme"/>
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/md_amber_700</item>
+        <item name="colorPrimaryDark">@color/md_amber_800</item>
+        <item name="colorAccent">@color/md_red_A200</item>
     </style>
+
+    <style name="AppTheme.Toolbar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlHighlight">@color/md_white_1000</item>
+        <item name="selectableItemBackground">?android:selectableItemBackground</item>
+        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackgroundBorderless</item>
+    </style>
+
+    <style name="AppTheme.Popup" parent="@style/Theme.AppCompat.Light"/>
 
 </resources>

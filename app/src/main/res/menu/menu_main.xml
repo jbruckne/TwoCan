@@ -10,6 +10,16 @@
     <item
         android:id="@+id/action_logout"
         android:title="@string/action_logout"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/something"
+        android:title="hmm"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/some"
+        android:title="wat"
+        app:showAsAction="always" />
 
 </menu>

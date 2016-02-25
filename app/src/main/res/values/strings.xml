@@ -2,8 +2,7 @@
     <string name="app_name">TwoCan</string>
     <string name="action_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Menu items -->
     <string name="action_revoke">Revoke</string>
-    <string name="action_logout">Logout</string>
+    <string name="action_logout">Log</string>
 </resources>

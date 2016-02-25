@@ -24,8 +24,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
     // View components
     lateinit var root: View
-    lateinit var toolbar: Toolbar
     var menu: Menu? = null
+    var toolbar: Toolbar? = null
     var fab: FloatingActionButton? = null
 
     protected var title: String = " "
@@ -37,11 +37,10 @@ abstract class BaseActivity : AppCompatActivity() {
         app = application as TwoCanApp
         root = window.decorView.rootView
 
-        val f = findViewById(fabId)
-        fab = if (f != null) f as FloatingActionButton else null
-        toolbar = findViewById(toolbarId) as Toolbar
+        fab = findViewById(fabId)?.let { it as FloatingActionButton }
+        toolbar = findViewById(toolbarId)?.let { it as Toolbar }
 
-        setSupportActionBar(toolbar)
+        if (toolbar != null) setSupportActionBar(toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
