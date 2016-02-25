@@ -3,6 +3,7 @@ package com.joebruckner.twocan.data
 import android.app.Activity
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import com.firebase.client.AuthData
 import com.firebase.client.Firebase
 import com.firebase.client.FirebaseError
@@ -14,9 +15,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.Status
 import rx.Observable
 
-class FirebaseAuthManager(val ref: Firebase, val activity: Activity):
+class FirebaseAuthManager(val ref: Firebase, val activity: Activity): AuthManager,
         GoogleApiClient.OnConnectionFailedListener {
 
     private val id = "283117977414-apg7r643phemhdp4tktp82gqitol1clr.apps.googleusercontent.com"
@@ -32,32 +34,77 @@ class FirebaseAuthManager(val ref: Firebase, val activity: Activity):
             .addApi(Auth.GOOGLE_SIGN_IN_API, options)
             .build();
 
-    fun getGoogleSignInIntent(): Intent {
+    override fun getGoogleSignInIntent(): Intent {
         return Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
     }
 
-    fun getTokenFromResult(result: GoogleSignInResult) : Observable<String> {
-        return Observable.create<String> ({ subscriber ->
-            val account = result.signInAccount!!
-            try {
-                val token = GoogleAuthUtil.getToken(
-                        activity,
-                        account.email,
-                        "oauth2:${Scopes.PLUS_ME} ${Scopes.EMAIL} ${Scopes.PROFILE}"
-                )
-                subscriber.onNext(token)
+    override fun signInWithGoogle(data: Intent): Observable<AuthData> {
+        return Observable.create { subscriber ->
+            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+            if (!result.isSuccess)
+                subscriber.onError(Exception(result.status.statusMessage))
+            val token = getTokenFromResult(result)
+            authWithToken(token, AuthManager.GOOGLE).subscribe ({ data ->
+                subscriber.onNext(data)
                 subscriber.onCompleted()
-            } catch (e: UserRecoverableAuthException) {
-                subscriber.onError(e)
-            }
-        })
+            }, { error ->
+                subscriber.onError(error)
+            })
+        }
+    }
+
+    private fun getTokenFromResult(result: GoogleSignInResult): String {
+        val account = result.signInAccount!!
+        try {
+            return GoogleAuthUtil.getToken(
+                    activity,
+                    account.email,
+                    "oauth2:${Scopes.PLUS_ME} ${Scopes.EMAIL} ${Scopes.PROFILE}"
+            )
+        } catch (e: UserRecoverableAuthException) {
+            throw e
+        }
     }
 
     override fun onConnectionFailed(result: ConnectionResult) {
         println(result.errorMessage)
     }
 
-    fun authWithToken(token: String, provider: String): Observable<AuthData> {
+    override fun signOutWithGoogle(): Observable<Status> {
+        ref.unauth()
+        return Observable.create { subscriber ->
+            Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback { result ->
+                if (result.isSuccess) subscriber.onNext(result)
+                else subscriber.onError(Exception("Failed to sign out"))
+            }
+        }
+    }
+
+    override fun disconnectGoogle(): Observable<Status> {
+        ref.unauth()
+        return Observable.create { subscriber ->
+            Auth.GoogleSignInApi.revokeAccess(googleApiClient).setResultCallback { result ->
+                if (result.isSuccess) subscriber.onNext(result)
+                else subscriber.onError(Exception("Failed to sign out"))
+                subscriber.onCompleted()
+            }
+        }
+    }
+
+    override fun signInWithFacebook() {
+        throw UnsupportedOperationException()
+    }
+
+    override fun signOutWithFacebook() {
+        throw UnsupportedOperationException()
+    }
+
+    override fun disconnectFacebook() {
+        throw UnsupportedOperationException()
+    }
+
+    private fun authWithToken(token: String, provider: String): Observable<AuthData> {
+        Log.d("Token[$provider]", token)
         return Observable.create<AuthData> ({ subscriber ->
             ref.authWithOAuthToken(provider, token, object: Firebase.AuthResultHandler {
                 override fun onAuthenticationError(error: FirebaseError) {
