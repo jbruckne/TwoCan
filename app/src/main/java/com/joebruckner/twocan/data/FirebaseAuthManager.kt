@@ -76,6 +76,7 @@ class FirebaseAuthManager(val ref: Firebase, val activity: Activity): AuthManage
             Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback { result ->
                 if (result.isSuccess) subscriber.onNext(result)
                 else subscriber.onError(Exception("Failed to sign out"))
+                subscriber.onCompleted()
             }
         }
     }
